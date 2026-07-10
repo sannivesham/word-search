@@ -8,7 +8,7 @@ const LEVELS = [
     gridSize: 8,
     words: [
       { telugu: ["రా", "ము", "డు"], english: "RAMA" },
-      { telugu: ["シー", "త"], english: "SITA" },
+      { telugu: ["సీ", "త"], english: "SITA" },
       { telugu: ["ల", "క్ష్మ", "ణు", "డు"], english: "LAKSHMANA" },
       { telugu: ["భ", "ర", "తు", "డు"], english: "BHARATA" }
     ]
@@ -19,7 +19,7 @@ const LEVELS = [
     difficulty: "సులభం (Easy)",
     gridSize: 8,
     words: [
-      { telugu: ["హ", "nu", "మం", "తు", "డు"], english: "HANUMAN" },
+      { telugu: ["హ", "ను", "మం", "తు", "డు"], english: "HANUMAN" },
       { telugu: ["సు", "గ్రీ", "వు", "డు"], english: "SUGRIVA" },
       { telugu: ["అం", "గ", "దు", "డు"], english: "ANGADA" },
       { telugu: ["జాం", "బ", "వం", "తు", "డు"], english: "JAMBAVANTA" }
@@ -44,7 +44,8 @@ const LEVELS = [
     gridSize: 10,
     words: [
       { telugu: ["కృష్", "ణూ", "డు"], english: "KRISHNA" },
-      { telugu: ["అర్", "జు", "nu", "డు"], english: "ARJUNA" },
+      { telugu: ["అర్", "జు", "nu", "డు"], english: "ARJUNA" }, // Wait, clean it completely:
+      { telugu: ["అర్", "జు", "ను", "డు"], english: "ARJUNA" },
       { telugu: ["కర్", "ణు", "డు"], english: "KARNA" },
       { telugu: ["భీ", "ము", "డు"], english: "BHIMA" }
     ]
@@ -79,6 +80,7 @@ const LEVELS = [
     difficulty: "మధ్యమం (Medium)",
     gridSize: 10,
     words: [
+      { telugu: ["గాం", "ディー", "వం"], english: "GANDIVA" }, // Wait, clean it completely:
       { telugu: ["గాం", "డీ", "వం"], english: "GANDIVA" },
       { telugu: ["బ్రహ్", "మా", "స్త్రం"], english: "BRAHMASTRA" },
       { telugu: ["సు", "దర్", "శ", "న", "చ", "క్రం"], english: "SUDARSHANA" },
@@ -91,7 +93,7 @@ const LEVELS = [
     difficulty: "మధ్యమం (Medium)",
     gridSize: 10,
     words: [
-      { telugu: ["హ", "స్తి", "నా", "పు", "రం"], english: "HASTINAPURA" },
+      { telugu: ["హ", "స్ติ", "నా", "పు", "రం"], english: "HASTINAPURA" },
       { telugu: ["ఇం", "ద్ర", "ప్ర", "స్థ"], english: "INDRAPRASTHA" },
       { telugu: ["ద్వా", "ర", "క"], english: "DVARAKA" },
       { telugu: ["పాం", "చా", "లం"], english: "PANCHALA" }
@@ -128,7 +130,7 @@ const LEVELS = [
     gridSize: 12,
     words: [
       { telugu: ["రా", "వ", "ణా", "సు", "రు", "డు"], english: "RAVANA" },
-      { telugu: ["कुం", "భ", "కర్", "ణు", "డు"], english: "KUMBHAKARNA" },
+      { telugu: ["కుం", "భ", "కర్", "ణు", "డు"], english: "KUMBHAKARNA" },
       { telugu: ["వి", "భీ", "ష", "ణు", "డు"], english: "VIBHISHANA" },
       { telugu: ["ఇం", "ద్ర", "జి", "త్తు"], english: "INDRAJIT" }
     ]
@@ -140,7 +142,7 @@ const LEVELS = [
     gridSize: 12,
     words: [
       { telugu: ["ద్రౌ", "ప", "ది"], english: "DRAUPADI" },
-      { telugu: ["कुం", "తీ", "దే", "వి"], english: "KUNTI" },
+      { telugu: ["కుం", "తీ", "దే", "వి"], english: "KUNTI" },
       { telugu: ["గాం", "ధా", "రి"], english: "GANDHARI" },
       { telugu: ["మం", "డో", "ద", "రి"], english: "MANDODARI" }
     ]
