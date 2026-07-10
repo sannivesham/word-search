@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>పద శోధన — ఆట స్థలం</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Contextual game styles integrated seamlessly alongside core layout rules */
+    .game-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 30px;
+      margin-top: 20px;
+    }
+    
+    .word-list-panel {
+      background: linear-gradient(160deg, var(--ink), var(--bg-deep));
+      border: 1px solid rgba(201,162,75,0.3);
+      border-radius: var(--radius);
+      padding: 20px;
+      height: fit-content;
+    }
+    
+    .word-list-panel h3 {
+      margin-top: 0;
+      color: var(--gold);
+      border-bottom: 1px solid rgba(201,162,75,0.2);
+      padding-bottom: 8px;
+    }
+    
+    .word-items {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .word-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: rgba(237,227,200,0.04);
+      font-size: 1.1rem;
+      transition: background 0.2s;
+    }
+    
+    .word-item.found {
+      background: rgba(31,122,108,0.2);
+      color: var(--parchment-dim);
+      text-decoration: line-through;
+      border-left: 3px solid var(--teal);
+    }
+    
+    .word-item .en-hint {
+      font-size: 0.85rem;
+      color: var(--gold);
+      opacity: 0.7;
+      font-family: 'Cinzel', serif;
+    }
+
+    /* Word Search matrix container spacing mechanics */
+    .ws-grid {
+      display: grid;
+      background: rgba(201,162,75,0.2);
+      border: 3px solid var(--gold);
+      border-radius: 8px;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none; /* Prevents mobile scrolling while drawing words */
+    }
+
+    .ws-cell {
+      background: var(--parchment);
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(1.1rem, 3.5vw, 1.6rem);
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.1s;
+    }
+
+    .ws-cell.selected {
+      background: #cdeee6; /* Highlights current swipe path */
+    }
+
+    .ws-cell.permanent-found {
+      background: #c9a24b; /* Locks solved tokens in gold color */
+      color: var(--bg-deep);
+    }
+
+    @media (max-width: 768px) {
+      .game-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+
+    <!-- Active Puzzle Breadcrumbs Stats Frame -->
+    <div class="game-header">
+      <div>
+        <h2 id="gameTitle">చాప్టర్</h2>
+        <p id="gameSubtitle" class="subtitle">లోడింగ్...</p>
+      </div>
+      <div class="game-stats">
+        <span>సమయం: <strong id="timer">00:00</strong></span>
+        <span>కనుగొన్నవి: <strong id="matchCount">0/0</strong></span>
+      </div>
+    </div>
+
+    <!-- Core Main Workspace Arena Split Panel -->
+    <div class="game-layout">
+      
+      <!-- Interactive Grid Workspace Panel -->
+      <div class="board-frame">
+        <div id="wordsearchGrid" class="ws-grid"></div>
+      </div>
+
+      <!-- Target Checklist Words Sidebar Tracking HUD -->
+      <div class="word-list-panel">
+        <h3>వెతకవలసిన పదాలు</h3>
+        <div id="wordItems" class="word-items"></div>
+        
+        <div class="controls-row" style="margin-top: 24px;">
+          <button id="backBtn" class="btn btn-secondary" onclick="window.location.href='index.html'">వెనుకకు</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- End Game Celebration Overlay Modal Layer -->
+  <div id="winOverlay" class="overlay hidden">
+    <div class="overlay-card">
+      <h2>అభినందనలు!</h2>
+      <p>మీరు విజయవంతంగా అన్ని పదాలను కనుగొన్నారు!</p>
+      <div id="winTime" style="margin: 18px 0; color: var(--gold); font-size: 1.1rem;"></div>
+      <div class="controls-row">
+        <button class="btn btn-secondary" onclick="window.location.href='index.html'">హోమ్ పేజీ</button>
+        <button id="nextLevelBtn" class="btn btn-primary">తదుపరి చాప్టర్</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Modules Execution Pipeline Injection -->
+  <script src="levels.js"></script>
+  <script src="progress.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
