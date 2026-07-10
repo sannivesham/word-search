@@ -6,7 +6,6 @@
   <title>పద శోధన — ఆట స్థలం</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Contextual game styles integrated seamlessly alongside core layout rules */
     .game-layout {
       display: grid;
       grid-template-columns: 1fr 300px;
@@ -60,7 +59,6 @@
       font-family: 'Cinzel', serif;
     }
 
-    /* Word Search matrix container spacing mechanics */
     .ws-grid {
       display: grid;
       background: rgba(201,162,75,0.2);
@@ -70,7 +68,7 @@
       aspect-ratio: 1 / 1;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: none; /* Prevents mobile scrolling while drawing words */
+      touch-action: none;
     }
 
     .ws-cell {
@@ -87,11 +85,11 @@
     }
 
     .ws-cell.selected {
-      background: #cdeee6; /* Highlights current swipe path */
+      background: #cdeee6;
     }
 
     .ws-cell.permanent-found {
-      background: #c9a24b; /* Locks solved tokens in gold color */
+      background: #c9a24b;
       color: var(--bg-deep);
     }
 
@@ -105,6 +103,17 @@
 <body>
 
   <div class="wrap">
+
+    <!-- Cinematic Branded Hero Section -->
+    <div class="sannivesham-hero">
+      <div class="hero-logo-wrapper">
+        <div class="hero-emblem">
+          <img src="logo.png" alt="Sannivesham Logo" class="emblem-img">
+        </div>
+      </div>
+      <h1 class="main-brand-title">సన్నివేశం</h1>
+      <p class="main-brand-tagline">సంస్కృతి • సంప్రదాయం • సంభాషణ</p>
+    </div>
 
     <!-- Active Puzzle Breadcrumbs Stats Frame -->
     <div class="game-header">
@@ -153,7 +162,6 @@
     </div>
   </div>
 
-  <!-- Script Modules Execution Pipeline Injection -->
   <script src="levels.js"></script>
   <script src="progress.js"></script>
   <script src="game.js"></script>
