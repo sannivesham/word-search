@@ -1,4 +1,4 @@
-import { db, auth } from "../firebase-config.js";
+import { db, auth } from "https://sannivesham.com/firebase-config.js";
 import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 
@@ -6,7 +6,7 @@ const Progress = (() => {
   // Determine which game folder this script is executing inside
   const path = window.location.pathname;
   const GAME_KEY = path.includes("word-search") ? "wordSearch" : 
-                   path.includes("sliding-puzzle") ? "slidingPuzzle" : "sudoku";
+                   path.includes("Sliding-Puzzle") ? "slidingPuzzle" : "sudoku";
   
   const LOCAL_KEY = `sannivesham_${GAME_KEY}_fallback`;
   let currentUser = null;
@@ -56,7 +56,6 @@ const Progress = (() => {
     const completed = data.completedLevels.includes(Number(levelId));
     const scoreMetric = data.metrics?.[levelId] || null;
 
-    // Standardize tracking return properties based on active game rules
     return {
       completed: completed,
       bestMoves: GAME_KEY === "slidingPuzzle" ? scoreMetric : null,
