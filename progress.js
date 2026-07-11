@@ -4,9 +4,11 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/f
 
 const Progress = (() => {
   // Determine which game folder this script is executing inside
-  const path = window.location.pathname;
+  const path = window.location.pathname.toLowerCase();
+  
+  // FIXED: Now tracks both "sudoko" and "sudoku" paths seamlessly
   const GAME_KEY = path.includes("word-search") ? "wordSearch" : 
-                   path.includes("Sliding-Puzzle") ? "slidingPuzzle" : "sudoku";
+                   path.includes("sliding-puzzle") ? "slidingPuzzle" : "sudoku";
   
   const LOCAL_KEY = `sannivesham_${GAME_KEY}_fallback`;
   let currentUser = null;
