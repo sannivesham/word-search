@@ -20,7 +20,7 @@
   if (nameEl) nameEl.textContent = `· ${level.titleEnglish}`;
 
   const size = level.gridSize;
-  const wordList = level.words;
+  const wordList = level.words; 
   const displayList = level.displayWords;
   
   let discoveredWords = [];
@@ -28,12 +28,12 @@
   let startCell = null;
   let gridMatrix = Array(size).fill(null).map(() => Array(size).fill(""));
 
-  const teluguCharacters = ["అ", "ఆ", "ఇ", "ఈ", "ఉ", "క", "గా", "చ", "జా", "ట", "డా", "త", "దా", "న", "ప", "బా", "మ", "య", "ర", "ల", "వ", "స", "హ", "ము", "డు", "రి", "శ"];
+  const teluguCharacters = ["అ", "ఆ", "ఇ", "ఈ", "ఉ", "క", "గ", "చ", "జ", "ట", "డ", "త", "ద", "న", "ప", "బ", "మ", "ย", "ర", "ల", "వ", "స", "హ", "ము", "డు", "రి", "శ", "లం", "క్ష", "జ్ఞ"].map(x => x === "ย" ? "య" : x);
 
   wordList.forEach((wordArr) => {
     let placed = false;
     let attempts = 0;
-    while (!placed && attempts < 150) {
+    while (!placed && attempts < 200) {
       const direction = Math.random() > 0.5 ? "H" : "V";
       const row = Math.floor(Math.random() * (direction === "V" ? (size - wordArr.length) : size));
       const col = Math.floor(Math.random() * (direction === "H" ? (size - wordArr.length) : size));
@@ -68,7 +68,7 @@
     }
   }
 
-  const container = document.getElementById("gridContainer");
+  const container = document.getElementById("gridContainer") || document.getElementById("grid");
   if (container) {
     container.innerHTML = "";
     container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
@@ -85,8 +85,6 @@
     }
   }
 
-  // --- UNIFIED TOUCH & MOUSE INTERACTION CONTROLLERS ---
-  
   function getCellFromCoords(x, y) {
     const element = document.elementFromPoint(x, y);
     if (element && element.classList.contains("word-cell")) {
@@ -151,7 +149,6 @@
     const cells = container.querySelectorAll(".word-cell");
     cells.forEach(el => el.classList.remove("selecting"));
 
-    // Lock to vertical or horizontal straight paths exclusively
     if (startCell.r === currentR || startCell.c === currentC) {
       const minR = Math.min(startCell.r, currentR);
       const maxR = Math.max(startCell.r, currentR);
@@ -168,38 +165,41 @@
     }
   }
 
-  // Desktop Mouse Triggers
+  // Mouse event listeners for desktop
   if (container) {
     container.addEventListener("mousedown", (e) => {
+      e.preventDefault();
       const cell = getCellFromCoords(e.clientX, e.clientY);
       if (cell) startSelection(cell.r, cell.c);
     });
 
     container.addEventListener("mousemove", (e) => {
+      e.preventDefault();
       const cell = getCellFromCoords(e.clientX, e.clientY);
       if (cell) moveSelection(cell.r, cell.c);
     });
 
-    // Mobile Contact Touch Triggers
+    // Mobile touch event listeners with forced preventDefault to enable dragging
     container.addEventListener("touchstart", (e) => {
       if (e.touches.length > 0) {
+        e.preventDefault();
         const cell = getCellFromCoords(e.touches[0].clientX, e.touches[0].clientY);
         if (cell) startSelection(cell.r, cell.c);
       }
-    });
+    }, { passive: false });
 
     container.addEventListener("touchmove", (e) => {
       if (e.touches.length > 0) {
+        e.preventDefault();
         const cell = getCellFromCoords(e.touches[0].clientX, e.touches[0].clientY);
         if (cell) moveSelection(cell.r, cell.c);
       }
-    });
+    }, { passive: false });
   }
 
   document.addEventListener("mouseup", endSelection);
   document.addEventListener("touchend", endSelection);
 
-  // Generate Word Checklist
   const wordBank = document.getElementById("wordBank");
   if (wordBank) {
     wordBank.innerHTML = "";
