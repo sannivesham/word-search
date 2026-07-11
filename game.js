@@ -11,8 +11,10 @@
     return;
   }
 
-  document.getElementById("levelTitle").textContent = `లెవెల్ ${level.id}: ${level.titleTelugu}`;
-  document.getElementById("levelSubtitle").textContent = `${level.gridSize}×${level.gridSize} · ${level.titleEnglish}`;
+  const titleEl = document.getElementById("levelTitle");
+  const subtitleEl = document.getElementById("levelSubtitle");
+  if(titleEl) titleEl.textContent = `లెవెల్ ${level.id}: ${level.titleTelugu}`;
+  if(subtitleEl) subtitleEl.textContent = `${level.gridSize}×${level.gridSize} · ${level.titleEnglish}`;
 
   const size = level.gridSize;
   const wordList = level.words;
@@ -21,9 +23,8 @@
   let startCell = null;
   let gridMatrix = Array(size).fill(null).map(() => Array(size).fill(""));
 
-  const teluguCharacters = ["అ", "ఆ", "ఇ", "ఈ", "ఉ", "ఊ", "ఋ", "ఎ", "ఏ", "ఐ", "ఒ", "ఓ", "ఔ", "క", "ఖ", "గ", "ఘ", "చ", "ఛ", "జ", "ఝ", "ట", "ఠ", "డ", "ఢ", "త", "థ", "ద", "ధ", "న", "ప", "ఫ", "బ", "భ", "మ", "య", "ర", "ల", "వ", "శ", "ష", "స", "హ", "ళ", "క్ష", "ఱ"];
+  const teluguCharacters = ["అ", "ఆ", "ఇ", "ఈ", "ఉ", "ఊ", "క", "గ", "చ", "జ", "ట", "డ", "త", "ద", "న", "ప", "బ", "మ", "య", "ర", "ల", "వ", "స", "హ"];
 
-  // Inject target strings into the matrix arrays horizontally and vertically
   wordList.forEach((word) => {
     let placed = false;
     let attempts = 0;
@@ -54,7 +55,6 @@
     }
   });
 
-  // Fill remaining null indices with random characters
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       if (gridMatrix[r][c] === "") {
@@ -63,36 +63,47 @@
     }
   }
 
-  // Draw Game UI Grid Node Systems
-  const container = document.getElementById("gridContainer");
-  container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-  container.innerHTML = "";
+  // Fallback Element Tracker to find whatever container selector is named
+  const container = document.getElementById("gridContainer") || document.getElementById("grid") || document.getElementById("levelGrid");
+  if (container) {
+    container.style.display = "grid";
+    container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    container.innerHTML = "";
 
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      const cell = document.createElement("div");
-      cell.className = "word-cell";
-      cell.dataset.row = r;
-      cell.dataset.col = c;
-      cell.textContent = gridMatrix[r][c];
-      
-      cell.addEventListener("mousedown", () => handleStart(r, c));
-      cell.addEventListener("mouseenter", () => handleMove(r, c));
-      container.appendChild(cell);
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        const cell = document.createElement("div");
+        cell.className = "word-cell";
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        cell.textContent = gridMatrix[r][c];
+        
+        cell.style.display = "flex";
+        cell.style.alignItems = "center";
+        cell.style.justifyContent = "center";
+        cell.style.cursor = "pointer";
+        cell.style.userSelect = "none";
+        
+        cell.addEventListener("mousedown", () => handleStart(r, c));
+        cell.addEventListener("mouseenter", () => handleMove(r, c));
+        container.appendChild(cell);
+      }
     }
   }
 
   document.addEventListener("mouseup", handleEnd);
 
   const wordBank = document.getElementById("wordBank");
-  wordBank.innerHTML = "";
-  wordList.forEach(w => {
-    const item = document.createElement("div");
-    item.className = "word-bank-item";
-    item.id = `word-${w}`;
-    item.textContent = w;
-    wordBank.appendChild(item);
-  });
+  if (wordBank) {
+    wordBank.innerHTML = "";
+    wordList.forEach(w => {
+      const item = document.createElement("div");
+      item.className = "word-bank-item";
+      item.id = `word-${w}`;
+      item.textContent = w;
+      wordBank.appendChild(item);
+    });
+  }
 
   function handleStart(r, c) {
     isSelecting = true;
@@ -106,6 +117,7 @@
   }
 
   function updateHighlights(currentR, currentC) {
+    if(!container) return;
     const cells = container.querySelectorAll(".word-cell");
     cells.forEach(el => el.classList.remove("selecting"));
 
@@ -126,7 +138,7 @@
   }
 
   function handleEnd() {
-    if (!isSelecting) return;
+    if (!isSelecting || !container) return;
     isSelecting = false;
     
     const selectedCells = container.querySelectorAll(".word-cell.selecting");
@@ -148,7 +160,8 @@
         el.classList.remove("selecting");
         el.classList.add("discovered");
       });
-      document.getElementById(`word-${foundWord}`).classList.add("found");
+      const bankItem = document.getElementById(`word-${foundWord}`);
+      if(bankItem) bankItem.classList.add("found");
       checkVictory();
     } else {
       selectedCells.forEach(el => el.classList.remove("selecting"));
@@ -160,7 +173,8 @@
       if (window.Progress && typeof window.Progress.recordCompletion === "function") {
         window.Progress.recordCompletion(level.id, 0);
       }
-      document.getElementById("winOverlay").classList.remove("hidden");
+      const overlay = document.getElementById("winOverlay");
+      if(overlay) overlay.classList.remove("hidden");
     }
   }
 })();
