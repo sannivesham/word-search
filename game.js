@@ -17,37 +17,40 @@
   if(subtitleEl) subtitleEl.textContent = `${level.gridSize}×${level.gridSize} · ${level.titleEnglish}`;
 
   const size = level.gridSize;
-  const wordList = level.words;
+  const wordList = level.words; // Array of arrays of compound characters
+  const displayList = level.displayWords;
+  
   let discoveredWords = [];
   let isSelecting = false;
   let startCell = null;
   let gridMatrix = Array(size).fill(null).map(() => Array(size).fill(""));
 
-  const teluguCharacters = ["అ", "ఆ", "ఇ", "ఈ", "ఉ", "ఊ", "క", "గ", "చ", "జ", "ట", "డ", "త", "ద", "న", "ప", "బ", "మ", "య", "ర", "ల", "వ", "స", "హ"];
+  const teluguCharacters = ["అ", "ఆ", "ఇ", "ఈ", "ఉ", "ఊ", "క", "గా", "చ", "జా", "ట", "డా", "త", "దా", "న", "ప", "బా", "మ", "య", "ర", "ల", "వ", "స", "హ", "ము", "డు", "రి", "శ", "ళ"];
 
-  wordList.forEach((word) => {
+  // Inject words safely as stable atomic subarrays
+  wordList.forEach((wordArr, index) => {
     let placed = false;
     let attempts = 0;
-    while (!placed && attempts < 100) {
+    while (!placed && attempts < 150) {
       const direction = Math.random() > 0.5 ? "H" : "V";
-      const row = Math.floor(Math.random() * (direction === "V" ? (size - word.length) : size));
-      const col = Math.floor(Math.random() * (direction === "H" ? (size - word.length) : size));
+      const row = Math.floor(Math.random() * (direction === "V" ? (size - wordArr.length) : size));
+      const col = Math.floor(Math.random() * (direction === "H" ? (size - wordArr.length) : size));
 
       let collision = false;
-      for (let i = 0; i < word.length; i++) {
+      for (let i = 0; i < wordArr.length; i++) {
         const r = direction === "V" ? row + i : row;
         const c = direction === "H" ? col + i : col;
-        if (gridMatrix[r][c] !== "" && gridMatrix[r][c] !== word[i]) {
+        if (gridMatrix[r][c] !== "" && gridMatrix[r][c] !== wordArr[i]) {
           collision = true;
           break;
         }
       }
 
       if (!collision) {
-        for (let i = 0; i < word.length; i++) {
+        for (let i = 0; i < wordArr.length; i++) {
           const r = direction === "V" ? row + i : row;
           const c = direction === "H" ? col + i : col;
-          gridMatrix[r][c] = word[i];
+          gridMatrix[r][c] = wordArr[i];
         }
         placed = true;
       }
@@ -95,7 +98,7 @@
   const wordBank = document.getElementById("wordBank");
   if (wordBank) {
     wordBank.innerHTML = "";
-    wordList.forEach(w => {
+    displayList.forEach(w => {
       const item = document.createElement("div");
       item.className = "word-bank-item";
       item.id = `word-${w}`;
@@ -141,17 +144,25 @@
     isSelecting = false;
     
     const selectedCells = container.querySelectorAll(".word-cell.selecting");
-    let currentString = "";
-    selectedCells.forEach(el => currentString += el.textContent);
+    let builtWordString = "";
+    selectedCells.forEach(el => builtWordString += el.textContent);
 
-    const reversedString = currentString.split("").reverse().join("");
+    // Look for combinations matching forward or reverse text directions
     let foundWord = null;
-
-    if (wordList.includes(currentString) && !discoveredWords.includes(currentString)) {
-      foundWord = currentString;
-    } else if (wordList.includes(reversedString) && !discoveredWords.includes(reversedString)) {
-      foundWord = reversedString;
-    }
+    displayList.forEach(w => {
+      if (discoveredWords.includes(w)) return;
+      
+      // Eliminate compound spaces to perform exact equivalence check
+      const standardPlain = w.replace(/\s+/g, "");
+      if (builtWordString === standardPlain) {
+        foundWord = w;
+      } else {
+        const revBuilt = builtWordString.split("").reverse().join("");
+        if (revBuilt === standardPlain) {
+          foundWord = w;
+        }
+      }
+    });
 
     if (foundWord) {
       discoveredWords.push(foundWord);
@@ -168,7 +179,7 @@
   }
 
   function checkVictory() {
-    if (discoveredWords.length === wordList.length) {
+    if (discoveredWords.length === displayList.length) {
       if (window.Progress && typeof window.Progress.recordCompletion === "function") {
         window.Progress.recordCompletion(level.id, 0);
       }
