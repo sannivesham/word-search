@@ -63,8 +63,7 @@
     }
   }
 
-  // Fallback Element Tracker to find whatever container selector is named
-  const container = document.getElementById("gridContainer") || document.getElementById("grid") || document.getElementById("levelGrid");
+  const container = document.getElementById("gridContainer");
   if (container) {
     container.style.display = "grid";
     container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
@@ -175,6 +174,18 @@
       }
       const overlay = document.getElementById("winOverlay");
       if(overlay) overlay.classList.remove("hidden");
+
+      const nextBtn = document.getElementById("nextLevelBtn");
+      if (nextBtn) {
+        const nextLevel = window.WORDSEARCH_LEVELS ? window.WORDSEARCH_LEVELS.find(l => l.id === (level.id + 1)) : null;
+        if (nextLevel) {
+          nextBtn.onclick = () => {
+            window.location.href = `game.html?level=${nextLevel.id}`;
+          };
+        } else {
+          nextBtn.style.display = "none";
+        }
+      }
     }
   }
 })();
