@@ -1,58 +1,26 @@
 (function () {
-  // 1. Level Data built directly into the script to prevent timing errors
-  const MODULE_LEVELS = [
-    {
-      id: 1,
-      titleTelugu: "రామాయణ పాత్రలు",
-      titleEnglish: "Ramayana Heroes",
-      gridSize: "8×8",
-      difficulty: "Easy"
-    },
-    {
-      id: 2,
-      titleTelugu: "వానర సేన",
-      titleEnglish: "The Vanara Army",
-      gridSize: "8×8",
-      difficulty: "Easy"
-    },
-    {
-      id: 3,
-      titleTelugu: "ఇతిహాస నగరాలు",
-      titleEnglish: "Epic Cities",
-      gridSize: "10×10",
-      difficulty: "Medium"
-    },
-    {
-      id: 4,
-      titleTelugu: "మహాభారత వీరులు",
-      titleEnglish: "Mahabharata Warriors",
-      gridSize: "10×10",
-      difficulty: "Medium"
-    },
-    {
-      id: 5,
-      titleTelugu: "రామాయణ ఋషులు",
-      titleEnglish: "Sages of Ramayana",
-      gridSize: "8×8",
-      difficulty: "Easy"
-    },
-    {
-      id: 6,
-      titleTelugu: "మహాభారత గురువులు",
-      titleEnglish: "Gurus of Mahabharata",
-      gridSize: "8×8",
-      difficulty: "Easy"
-    }
+  const WORDSEARCH_MODULE_LEVELS = [
+    { id: 1, titleTelugu: "అయోధ్య ద్వారం", titleEnglish: "Ayodhya's Gate", gridSize: 8, difficulty: "Easy" },
+    { id: 2, titleTelugu: "పంచవటి వనం", titleEnglish: "Panchavati Grove", gridSize: 8, difficulty: "Easy" },
+    { id: 3, titleTelugu: "చిత్రకూట ఆశ్రమం", titleEnglish: "Chitrakoot Hermitage", gridSize: 8, difficulty: "Easy" },
+    { id: 4, titleTelugu: "కిష్కింధ సభ", titleEnglish: "Kishkindha Court", gridSize: 8, difficulty: "Easy" },
+    { id: 5, titleTelugu: "లంకా ప్రాకారం", titleEnglish: "Lanka's Ramparts", gridSize: 10, difficulty: "Medium" },
+    { id: 6, titleTelugu: "అశోక వనం", titleEnglish: "Ashoka Vatika", gridSize: 10, difficulty: "Medium" },
+    { id: 7, titleTelugu: "శబరి కుటీరం", titleEnglish: "Sabari's Cottage", gridSize: 10, difficulty: "Medium" },
+    { id: 8, titleTelugu: "ఋశ్యమూక పర్వతం", titleEnglish: "Rishyamuka Hill", gridSize: 10, difficulty: "Medium" },
+    { id: 9, titleTelugu: "దండకారణ్యం", titleEnglish: "Dandaka Forest", gridSize: 12, difficulty: "Hard" },
+    { id: 10, titleTelugu: "మిథిలా నగరం", titleEnglish: "Mithila Kingdom", gridSize: 12, difficulty: "Hard" },
+    { id: 11, titleTelugu: "క్షీర సాగరం", titleEnglish: "Cosmic Ocean", gridSize: 12, difficulty: "Hard" },
+    { id: 12, titleTelugu: "శ్రీరామ సామ్రాజ్యం", titleEnglish: "Rama's Empire", gridSize: 12, difficulty: "Hard" }
   ];
 
   function renderGrid() {
-    const gridEl = document.getElementById("levelGrid");
+    const gridEl = document.getElementById("levelGrid") || document.getElementById("grid");
     if (!gridEl) return;
 
     gridEl.innerHTML = "";
 
-    MODULE_LEVELS.forEach((level) => {
-      // Safe checking against the active Progress cloud bridge
+    WORDSEARCH_MODULE_LEVELS.forEach((level) => {
       const isUnlocked = typeof window.Progress?.isUnlocked === "function" 
         ? window.Progress.isUnlocked(level.id) 
         : (level.id === 1);
@@ -65,16 +33,15 @@
       card.className = `level-card ${isUnlocked ? "" : "locked"}`;
       
       if (isUnlocked) {
-        // FIXED: Points to wordsearch.html instead of game.html
-        card.href = `wordsearch.html?level=${level.id}`;
+        card.href = `game.html?level=${level.id}`;
       }
 
       let innerHTML = `
-        <div class="level-number">CHAPTER ${level.id}</div>
+        <div class="level-number">LEVEL ${level.id}</div>
         <div class="level-title" style="font-weight: 600; font-size: 1.35rem; margin-bottom: 2px;">${level.titleTelugu}</div>
         <div class="level-subtitle" style="font-family: 'Cinzel', serif; font-size: 0.95rem; color: var(--gold); opacity: 0.85; margin-bottom: 12px;">(${level.titleEnglish})</div>
         <div class="level-meta" style="font-size: 0.85rem; opacity: 0.75;">
-          <span>Grid: ${level.gridSize} · ${level.difficulty}</span>
+          <span>Grid: ${level.gridSize}×${level.gridSize} · ${level.difficulty}</span>
       `;
 
       if (progress.completed && progress.bestTime) {
@@ -92,7 +59,6 @@
     });
   }
 
-  // Run immediately and set continuous backup intervals until the cloud sync completes loading
   renderGrid();
   setInterval(renderGrid, 500);
 })();
