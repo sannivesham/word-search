@@ -24,7 +24,7 @@
     },
     {
       id: 4,
-      titleTelugu: "మહાభారత వీరులు",
+      titleTelugu: "మహాభారత వీరులు",
       titleEnglish: "Mahabharata Warriors",
       gridSize: "10×10",
       difficulty: "Medium"
@@ -38,7 +38,7 @@
     },
     {
       id: 6,
-      titleTelugu: "మહાభారత గురువులు",
+      titleTelugu: "మహాభారత గురువులు",
       titleEnglish: "Gurus of Mahabharata",
       gridSize: "8×8",
       difficulty: "Easy"
@@ -65,7 +65,8 @@
       card.className = `level-card ${isUnlocked ? "" : "locked"}`;
       
       if (isUnlocked) {
-        card.href = `game.html?level=${level.id}`;
+        // FIXED: Points to wordsearch.html instead of game.html
+        card.href = `wordsearch.html?level=${level.id}`;
       }
 
       let innerHTML = `
