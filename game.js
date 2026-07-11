@@ -12,12 +12,15 @@
   }
 
   const titleEl = document.getElementById("levelTitle");
-  const subtitleEl = document.getElementById("levelSubtitle");
-  if(titleEl) titleEl.textContent = `లెవెల్ ${level.id}: ${level.titleTelugu}`;
-  if(subtitleEl) subtitleEl.textContent = `${level.gridSize}×${level.gridSize} · ${level.titleEnglish}`;
+  const dimEl = document.getElementById("levelSubtitleDimensions");
+  const nameEl = document.getElementById("levelSubtitleName");
+  
+  if (titleEl) titleEl.textContent = `లెవెల్ ${level.id}: ${level.titleTelugu}`;
+  if (dimEl) dimEl.textContent = `${level.gridSize}×${level.gridSize}`;
+  if (nameEl) nameEl.textContent = `· ${level.titleEnglish}`;
 
   const size = level.gridSize;
-  const wordList = level.words; // Array of arrays of compound characters
+  const wordList = level.words;
   const displayList = level.displayWords;
   
   let discoveredWords = [];
@@ -25,10 +28,9 @@
   let startCell = null;
   let gridMatrix = Array(size).fill(null).map(() => Array(size).fill(""));
 
-  const teluguCharacters = ["అ", "ఆ", "ఇ", "ఈ", "ఉ", "ఊ", "క", "గా", "చ", "జా", "ట", "డా", "త", "దా", "న", "ప", "బా", "మ", "య", "ర", "ల", "వ", "స", "హ", "ము", "డు", "రి", "శ", "ళ"];
+  const teluguCharacters = ["అ", "ఆ", "ఇ", "ఈ", "ఉ", "క", "గా", "చ", "జా", "ట", "డా", "త", "దా", "న", "ప", "బా", "మ", "య", "ర", "ల", "వ", "స", "హ", "ము", "డు", "రి", "శ"];
 
-  // Inject words safely as stable atomic subarrays
-  wordList.forEach((wordArr, index) => {
+  wordList.forEach((wordArr) => {
     let placed = false;
     let attempts = 0;
     while (!placed && attempts < 150) {
@@ -68,9 +70,8 @@
 
   const container = document.getElementById("gridContainer");
   if (container) {
-    container.style.display = "grid";
-    container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
     container.innerHTML = "";
+    container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
 
     for (let r = 0; r < size; r++) {
       for (let c = 0; c < size; c++) {
@@ -79,67 +80,36 @@
         cell.dataset.row = r;
         cell.dataset.col = c;
         cell.textContent = gridMatrix[r][c];
-        
-        cell.style.display = "flex";
-        cell.style.alignItems = "center";
-        cell.style.justifyContent = "center";
-        cell.style.cursor = "pointer";
-        cell.style.userSelect = "none";
-        
-        cell.addEventListener("mousedown", () => handleStart(r, c));
-        cell.addEventListener("mouseenter", () => handleMove(r, c));
         container.appendChild(cell);
       }
     }
   }
 
-  document.addEventListener("mouseup", handleEnd);
-
-  const wordBank = document.getElementById("wordBank");
-  if (wordBank) {
-    wordBank.innerHTML = "";
-    displayList.forEach(w => {
-      const item = document.createElement("div");
-      item.className = "word-bank-item";
-      item.id = `word-${w}`;
-      item.textContent = w;
-      wordBank.appendChild(item);
-    });
+  // --- UNIFIED TOUCH & MOUSE INTERACTION CONTROLLERS ---
+  
+  function getCellFromCoords(x, y) {
+    const element = document.elementFromPoint(x, y);
+    if (element && element.classList.contains("word-cell")) {
+      return {
+        r: Number(element.dataset.row),
+        c: Number(element.dataset.col)
+      };
+    }
+    return null;
   }
 
-  function handleStart(r, c) {
+  function startSelection(r, c) {
     isSelecting = true;
     startCell = { r, c };
     updateHighlights(r, c);
   }
 
-  function handleMove(r, c) {
+  function moveSelection(r, c) {
     if (!isSelecting) return;
     updateHighlights(r, c);
   }
 
-  function updateHighlights(currentR, currentC) {
-    if(!container) return;
-    const cells = container.querySelectorAll(".word-cell");
-    cells.forEach(el => el.classList.remove("selecting"));
-
-    const minR = Math.min(startCell.r, currentR);
-    const maxR = Math.max(startCell.r, currentR);
-    const minC = Math.min(startCell.c, currentC);
-    const maxC = Math.max(startCell.c, currentC);
-
-    if (startCell.r === currentR || startCell.c === currentC) {
-      cells.forEach(el => {
-        const r = Number(el.dataset.row);
-        const c = Number(el.dataset.col);
-        if (r >= minR && r <= maxR && c >= minC && c <= maxC) {
-          el.classList.add("selecting");
-        }
-      });
-    }
-  }
-
-  function handleEnd() {
+  function endSelection() {
     if (!isSelecting || !container) return;
     isSelecting = false;
     
@@ -147,18 +117,16 @@
     let builtWordString = "";
     selectedCells.forEach(el => builtWordString += el.textContent);
 
-    // Look for combinations matching forward or reverse text directions
     let foundWord = null;
     displayList.forEach(w => {
       if (discoveredWords.includes(w)) return;
+      const cleanTarget = w.replace(/\s+/g, "");
       
-      // Eliminate compound spaces to perform exact equivalence check
-      const standardPlain = w.replace(/\s+/g, "");
-      if (builtWordString === standardPlain) {
+      if (builtWordString === cleanTarget) {
         foundWord = w;
       } else {
         const revBuilt = builtWordString.split("").reverse().join("");
-        if (revBuilt === standardPlain) {
+        if (revBuilt === cleanTarget) {
           foundWord = w;
         }
       }
@@ -176,6 +144,72 @@
     } else {
       selectedCells.forEach(el => el.classList.remove("selecting"));
     }
+  }
+
+  function updateHighlights(currentR, currentC) {
+    if(!container) return;
+    const cells = container.querySelectorAll(".word-cell");
+    cells.forEach(el => el.classList.remove("selecting"));
+
+    // Lock to vertical or horizontal straight paths exclusively
+    if (startCell.r === currentR || startCell.c === currentC) {
+      const minR = Math.min(startCell.r, currentR);
+      const maxR = Math.max(startCell.r, currentR);
+      const minC = Math.min(startCell.c, currentC);
+      const maxC = Math.max(startCell.c, currentC);
+
+      cells.forEach(el => {
+        const r = Number(el.dataset.row);
+        const c = Number(el.dataset.col);
+        if (r >= minR && r <= maxR && c >= minC && c <= maxC) {
+          el.classList.add("selecting");
+        }
+      });
+    }
+  }
+
+  // Desktop Mouse Triggers
+  if (container) {
+    container.addEventListener("mousedown", (e) => {
+      const cell = getCellFromCoords(e.clientX, e.clientY);
+      if (cell) startSelection(cell.r, cell.c);
+    });
+
+    container.addEventListener("mousemove", (e) => {
+      const cell = getCellFromCoords(e.clientX, e.clientY);
+      if (cell) moveSelection(cell.r, cell.c);
+    });
+
+    // Mobile Contact Touch Triggers
+    container.addEventListener("touchstart", (e) => {
+      if (e.touches.length > 0) {
+        const cell = getCellFromCoords(e.touches[0].clientX, e.touches[0].clientY);
+        if (cell) startSelection(cell.r, cell.c);
+      }
+    });
+
+    container.addEventListener("touchmove", (e) => {
+      if (e.touches.length > 0) {
+        const cell = getCellFromCoords(e.touches[0].clientX, e.touches[0].clientY);
+        if (cell) moveSelection(cell.r, cell.c);
+      }
+    });
+  }
+
+  document.addEventListener("mouseup", endSelection);
+  document.addEventListener("touchend", endSelection);
+
+  // Generate Word Checklist
+  const wordBank = document.getElementById("wordBank");
+  if (wordBank) {
+    wordBank.innerHTML = "";
+    displayList.forEach(w => {
+      const item = document.createElement("div");
+      item.className = "word-bank-item";
+      item.id = `word-${w}`;
+      item.textContent = w;
+      wordBank.appendChild(item);
+    });
   }
 
   function checkVictory() {
