@@ -14,7 +14,7 @@
     <div class="sannivesham-hero">
       <div class="hero-logo-wrapper">
         <div class="hero-emblem">
-          <img src="logo.png" alt="Sannivesham Logo" class="emblem-img">
+          <img src="https://sannivesham.com/images/logo.png" alt="Sannivesham Logo" class="emblem-img">
         </div>
       </div>
       
@@ -23,11 +23,12 @@
     </div>
 
     <!-- Game Section Header -->
-    <header class="site-header">
+    <header class="site-header" style="position: relative;">
       <div>
         <h2>పద శోధన (Word Search)</h2>
-        <p class="subtitle">అక్షరాల గడులలో దాగివున్న ఇతిహాస పదాలను కనుగొనండి.</p>
+        <p class="subtitle">అక్షరాల గడులలో దాగివున్న ఇతిహాస పదాలను వెలికితీయండి.</p>
       </div>
+      <a href="https://sannivesham.com" class="back-link" style="position: absolute; right: 0; bottom: 12px; color: #4CB5C9; text-decoration: none; font-size: 0.95rem;">← Back to main site</a>
     </header>
 
     <!-- Dynamic Level Selection Grid Container -->
@@ -36,8 +37,8 @@
   </div>
 
   <!-- Game Scripts Layer -->
-  <script src="levels.js"></script>
-<script type="module" src="progress.js"></script>
+  <script src="wordsearch-data.js"></script>
+  <script type="module" src="progress.js"></script>
   <script src="level-select.js"></script>
 </body>
 </html>
