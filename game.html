@@ -2,66 +2,92 @@
 <html lang="te">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>సన్నివేశం — పద శోధన ఆట</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Absolute safety styles to make sure grid boxes are forced visible */
-    .word-search-container {
-      max-width: 600px;
-      margin: 20px auto;
-      padding: 0 15px;
+    /* Prevent screen dragging and text selection while playing */
+    body {
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
     }
+
+    .word-search-container {
+      width: 100%;
+      max-width: 500px;
+      margin: 10px auto;
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+
     #gridContainer {
       display: grid !important;
-      gap: 6px;
+      gap: 4px;
       background: rgba(201, 162, 75, 0.05);
-      padding: 15px;
+      padding: 8px;
       border-radius: 8px;
       border: 1px solid rgba(201, 162, 75, 0.2);
-      margin-bottom: 20px;
+      margin: 0 auto 15px auto;
+      width: 100%;
+      box-sizing: border-box;
+      touch-action: none;
     }
+
     .word-cell {
       aspect-ratio: 1;
-      background: rgba(237, 227, 200, 0.05);
-      border: 1px solid rgba(237, 227, 200, 0.1);
+      background: rgba(237, 227, 200, 0.04);
+      border: 1px solid rgba(237, 227, 200, 0.08);
       border-radius: 4px;
       color: #EDE3C8;
-      font-size: 1.4rem;
       font-weight: bold;
-      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-sizing: border-box;
+      /* Responsive fluid scaling text */
+      font-size: clamp(0.9rem, 3.5vw, 1.4rem);
+      transition: background-color 0.15s, color 0.15s;
     }
+
     .word-cell.selecting {
-      background: rgba(76, 181, 201, 0.3) !important;
+      background: rgba(76, 181, 201, 0.4) !important;
       border-color: #4CB5C9 !important;
+      color: #fff !important;
     }
+
     .word-cell.discovered {
       background: rgba(201, 162, 75, 0.25) !important;
       border-color: #C9A24B !important;
       color: #C9A24B !important;
     }
+
     .word-bank {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
       justify-content: center;
-      margin-top: 20px;
+      margin-top: 15px;
+      padding: 0 10px;
     }
+
     .word-bank-item {
-      padding: 6px 14px;
+      padding: 5px 12px;
       background: rgba(237, 227, 200, 0.05);
       border: 1px solid rgba(237, 227, 200, 0.2);
       border-radius: 20px;
       color: rgba(237, 227, 200, 0.6);
-      font-size: 1.1rem;
+      font-size: clamp(0.85rem, 3vw, 1.05rem);
     }
+
     .word-bank-item.found {
       text-decoration: line-through;
       color: #C9A24B;
       background: rgba(201, 162, 75, 0.1);
       border-color: #C9A24B;
     }
-    /* Simple Win Overlay styling */
+
     .overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -72,14 +98,19 @@
       justify-content: center;
       z-index: 1000;
     }
+    
     .overlay.hidden { display: none !important; }
+    
     .overlay-content {
       text-align: center;
       background: rgba(25, 20, 15, 0.9);
-      padding: 40px;
+      padding: 30px;
       border: 1px solid #C9A24B;
       border-radius: 12px;
+      width: 80%;
+      max-width: 400px;
     }
+
     .gold-btn {
       background: transparent;
       border: 1px solid #C9A24B;
@@ -90,42 +121,54 @@
       margin-top: 20px;
       border-radius: 4px;
     }
+    
     .gold-btn:hover {
       background: #C9A24B;
       color: #110c08;
+    }
+
+    .subtitle-row {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 2px 0;
+      color: rgba(237, 227, 200, 0.6);
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
 
   <div class="wrap">
-    <div class="sannivesham-hero">
+    <!-- Cinematic Header Standard Structure -->
+    <div class="sannivesham-hero" style="margin-bottom: 15px;">
       <div class="hero-logo-wrapper">
         <div class="hero-emblem">
           <img src="https://sannivesham.com/images/logo.png" alt="Sannivesham Logo" class="emblem-img">
         </div>
       </div>
-      <h1 class="main-brand-title">సన్నివేశం</h1>
+      <h1 class="main-brand-title" style="font-size: 2.2rem; margin-top: 5px;">సన్నివేశం</h1>
     </div>
 
-    <header class="site-header" style="position: relative; text-align: center;">
+    <header class="site-header" style="position: relative; text-align: center; margin-bottom: 10px; padding-bottom: 10px;">
       <div>
-        <h2 id="levelTitle">లెవెల్</h2>
-        <p class="subtitle" id="levelSubtitle">పద శోధన</p>
+        <h2 id="levelTitle" style="font-size: 1.5rem; color: #EDE3C8;">లెవెల్</h2>
+        <div class="subtitle-row">
+          <span id="levelSubtitleDimensions"></span>
+          <span id="levelSubtitleName"></span>
+        </div>
       </div>
-      <a href="index.html" class="back-link" style="position: absolute; left: 20px; bottom: 12px; color: #4CB5C9; text-decoration: none;">← అన్ని లెవెల్స్</a>
+      <div style="margin-top: 8px;">
+        <a href="index.html" class="back-link" style="color: #4CB5C9; text-decoration: none; font-size: 0.9rem;">← అన్ని లెవెల్స్</a>
+      </div>
     </header>
 
     <div class="word-search-container">
-      <!-- Matrix Box Target Node -->
       <div id="gridContainer"></div>
-      
-      <!-- Word Target Checklist -->
       <div id="wordBank" class="word-bank"></div>
     </div>
   </div>
 
-  <!-- Victory Module Window Popup Frame -->
   <div id="winOverlay" class="overlay hidden">
     <div class="overlay-content">
       <h2 style="color: #C9A24B; font-family: 'Cinzel', serif; margin-bottom: 10px;">ధన్యవాదాలు!</h2>
