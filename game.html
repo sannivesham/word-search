@@ -32,6 +32,10 @@
       width: 100%;
       box-sizing: border-box;
       touch-action: none;
+      /* Prevents the grid tracks from expanding past 1fr to fit wide
+         conjunct characters, which is what was pushing 10x10/12x12
+         grids past the edge of the screen on mobile. */
+      overflow: hidden;
     }
 
     .word-cell {
@@ -46,8 +50,19 @@
       justify-content: center;
       cursor: pointer;
       box-sizing: border-box;
-      /* Responsive fluid scaling text */
-      font-size: clamp(0.9rem, 3.5vw, 1.4rem);
+      /* min-width/min-height: 0 overrides CSS Grid's default "min-width:
+         auto" on grid items, which otherwise sizes a track to fit its
+         widest piece of unbreakable content (e.g. multi-glyph conjuncts
+         like క్ష, జ్ఞ, లం) instead of the 1fr share it was actually
+         given — that mismatch is what caused the grid to overflow the
+         viewport on larger boards. */
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      /* Font size now scales down as column count (--cols, set by game.js)
+         goes up, so a 12x12 board gets noticeably smaller text than an
+         8x8 board instead of using the same size and overflowing. */
+      font-size: clamp(0.6rem, calc(26vw / var(--cols, 10)), 1.4rem);
       transition: background-color 0.15s, color 0.15s;
     }
 
@@ -98,9 +113,9 @@
       justify-content: center;
       z-index: 1000;
     }
-    
+
     .overlay.hidden { display: none !important; }
-    
+
     .overlay-content {
       text-align: center;
       background: rgba(25, 20, 15, 0.9);
@@ -121,7 +136,7 @@
       margin-top: 20px;
       border-radius: 4px;
     }
-    
+
     .gold-btn:hover {
       background: #C9A24B;
       color: #110c08;
