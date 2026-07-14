@@ -14,51 +14,82 @@
   const titleEl = document.getElementById("levelTitle");
   const dimEl = document.getElementById("levelSubtitleDimensions");
   const nameEl = document.getElementById("levelSubtitleName");
-  
+
   if (titleEl) titleEl.textContent = `లెవెల్ ${level.id}: ${level.titleTelugu}`;
   if (dimEl) dimEl.textContent = `${level.gridSize}×${level.gridSize}`;
   if (nameEl) nameEl.textContent = `· ${level.titleEnglish}`;
 
   const size = level.gridSize;
-  const wordList = level.words; 
+  const wordList = level.words;
   const displayList = level.displayWords;
-  
+
   let discoveredWords = [];
   let isSelecting = false;
   let startCell = null;
-  let gridMatrix = Array(size).fill(null).map(() => Array(size).fill(""));
+  let gridMatrix;
 
-  const teluguCharacters = ["అ", "ఆ", "ఇ", "ఈ", "ఉ", "క", "గ", "చ", "జ", "ట", "డ", "త", "ద", "న", "ప", "బ", "మ", "ย", "ర", "ల", "వ", "స", "హ", "ము", "డు", "రి", "శ", "లం", "క్ష", "జ్ఞ"].map(x => x === "ย" ? "య" : x);
+  const teluguCharacters = ["అ", "ఆ", "ఇ", "ఈ", "ఉ", "క", "గ", "చ", "జ", "ట", "డ", "త", "ద", "న", "ప", "బ", "మ", "య", "ర", "ల", "వ", "స", "హ", "ము", "డు", "రి", "శ", "లం", "క్ష", "జ్ఞ"];
 
-  wordList.forEach((wordArr) => {
-    let placed = false;
-    let attempts = 0;
-    while (!placed && attempts < 200) {
-      const direction = Math.random() > 0.5 ? "H" : "V";
-      const row = Math.floor(Math.random() * (direction === "V" ? (size - wordArr.length) : size));
-      const col = Math.floor(Math.random() * (direction === "H" ? (size - wordArr.length) : size));
+  // Try to place every word in wordList onto a fresh grid. Returns the
+  // filled grid on success, or null if any word couldn't be placed within
+  // the per-word attempt budget (caller should retry with a fresh grid).
+  function attemptGridGeneration() {
+    const matrix = Array(size).fill(null).map(() => Array(size).fill(""));
 
-      let collision = false;
-      for (let i = 0; i < wordArr.length; i++) {
-        const r = direction === "V" ? row + i : row;
-        const c = direction === "H" ? col + i : col;
-        if (gridMatrix[r][c] !== "" && gridMatrix[r][c] !== wordArr[i]) {
-          collision = true;
-          break;
-        }
-      }
+    for (const wordArr of wordList) {
+      let placed = false;
+      let attempts = 0;
+      while (!placed && attempts < 200) {
+        const direction = Math.random() > 0.5 ? "H" : "V";
+        const row = Math.floor(Math.random() * (direction === "V" ? (size - wordArr.length + 1) : size));
+        const col = Math.floor(Math.random() * (direction === "H" ? (size - wordArr.length + 1) : size));
 
-      if (!collision) {
+        let collision = false;
         for (let i = 0; i < wordArr.length; i++) {
           const r = direction === "V" ? row + i : row;
           const c = direction === "H" ? col + i : col;
-          gridMatrix[r][c] = wordArr[i];
+          if (matrix[r][c] !== "" && matrix[r][c] !== wordArr[i]) {
+            collision = true;
+            break;
+          }
         }
-        placed = true;
+
+        if (!collision) {
+          for (let i = 0; i < wordArr.length; i++) {
+            const r = direction === "V" ? row + i : row;
+            const c = direction === "H" ? col + i : col;
+            matrix[r][c] = wordArr[i];
+          }
+          placed = true;
+        }
+        attempts++;
       }
-      attempts++;
+
+      if (!placed) {
+        // This grid attempt failed — the word couldn't fit. Bail out so the
+        // caller can retry with a completely fresh grid rather than leaving
+        // a word that can never be found.
+        return null;
+      }
     }
-  });
+
+    return matrix;
+  }
+
+  function generateGrid() {
+    const MAX_GRID_ATTEMPTS = 30;
+    for (let attempt = 0; attempt < MAX_GRID_ATTEMPTS; attempt++) {
+      const matrix = attemptGridGeneration();
+      if (matrix) return matrix;
+    }
+    // Extremely unlikely fallback: if every attempt failed (grid too small
+    // for the word set), still return the last attempt's best-effort matrix
+    // padded with fillers, so the page doesn't crash outright.
+    console.error(`Word search level ${level.id}: could not place all words after ${MAX_GRID_ATTEMPTS} attempts.`);
+    return Array(size).fill(null).map(() => Array(size).fill(""));
+  }
+
+  gridMatrix = generateGrid();
 
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
@@ -110,7 +141,7 @@
   function endSelection() {
     if (!isSelecting || !container) return;
     isSelecting = false;
-    
+
     const selectedCells = container.querySelectorAll(".word-cell.selecting");
     let builtWordString = "";
     selectedCells.forEach(el => builtWordString += el.textContent);
@@ -119,7 +150,7 @@
     displayList.forEach(w => {
       if (discoveredWords.includes(w)) return;
       const cleanTarget = w.replace(/\s+/g, "");
-      
+
       if (builtWordString === cleanTarget) {
         foundWord = w;
       } else {
@@ -137,7 +168,7 @@
         el.classList.add("discovered");
       });
       const bankItem = document.getElementById(`word-${foundWord}`);
-      if(bankItem) bankItem.classList.add("found");
+      if (bankItem) bankItem.classList.add("found");
       checkVictory();
     } else {
       selectedCells.forEach(el => el.classList.remove("selecting"));
@@ -145,7 +176,7 @@
   }
 
   function updateHighlights(currentR, currentC) {
-    if(!container) return;
+    if (!container) return;
     const cells = container.querySelectorAll(".word-cell");
     cells.forEach(el => el.classList.remove("selecting"));
 
@@ -218,7 +249,7 @@
         window.Progress.recordCompletion(level.id, 0);
       }
       const overlay = document.getElementById("winOverlay");
-      if(overlay) overlay.classList.remove("hidden");
+      if (overlay) overlay.classList.remove("hidden");
 
       const nextBtn = document.getElementById("nextLevelBtn");
       if (nextBtn) {
