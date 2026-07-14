@@ -102,12 +102,19 @@ a { color: inherit; }
 
 .site-header {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 8px 16px;
   margin-top: 20px;
   margin-bottom: 36px;
   padding-bottom: 18px;
   border-bottom: 1px solid rgba(201,162,75,0.25);
+}
+
+.site-header-titles {
+  min-width: 200px;
+  flex: 1 1 auto;
 }
 
 .site-header h2 {
@@ -127,6 +134,7 @@ a { color: inherit; }
   color: var(--teal);
   font-weight: 600;
   font-size: 0.9rem;
+  white-space: nowrap;
   transition: color 0.15s ease;
 }
 
@@ -221,5 +229,4 @@ a { color: inherit; }
   .wrap { padding: 20px 14px; }
   .sannivesham-hero { padding: 12px 0 20px; }
   .hero-emblem { width: 110px; height: 110px; }
-  .site-header { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
