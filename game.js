@@ -103,6 +103,7 @@
   if (container) {
     container.innerHTML = "";
     container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    container.style.setProperty("--cols", size);
 
     for (let r = 0; r < size; r++) {
       for (let c = 0; c < size; c++) {
